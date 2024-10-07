@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <style>
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .calculator input {
+            grid-column: span 6;
+            text-align: right;
+            padding: 10px;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .calculator button {
+            padding: 20px;
+            font-size: 18px;
+            margin: 2px;
+        }
+
+        #result {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        .secondary {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <div class="container">
+        <h1 class="text-center mt-5">Enhanced Calculator</h1>
+        <div class="calculator mt-4">
+            <input type="text" id="expression" class="form-control" readonly>
+            <button class="btn btn-outline-secondary" onclick="clearExpression()">C</button>
+            <button class="btn btn-outline-secondary" onclick="toggleShift()" id="shiftButton">SHIFT</button>
+            <button class="btn btn-outline-secondary" onclick="backspace()">⌫</button>
+            <button class="btn btn-outline-secondary" onclick="appendValue('(')">(</button>
+            <button class="btn btn-outline-secondary" onclick="appendValue(')')">)</button>
+            <button class="btn btn-outline-danger" onclick="clearScreen()">AC</button>
+
+            <button class="btn btn-outline-primary" onclick="appendValue('7')">7</button>
+            <button class="btn btn-outline-primary" onclick="appendValue('8')">8</button>
+            <button class="btn btn-outline-primary" onclick="appendValue('9')">9</button>
+            <button class="btn btn-outline-secondary" onclick="appendValue('/')">/</button>
+            <button class="btn btn-outline-primary primary" onclick="appendValue('sin(')">sin</button>
+            <button class="btn btn-outline-primary primary" onclick="appendValue('^')">^</button>
+            <button class="btn btn-outline-primary secondary" onclick="appendValue('asin(')">sin⁻¹</button>
+            <button class="btn btn-outline-primary secondary" onclick="appendValue('^(-1)')">x⁻¹</button>
+
+            <button class="btn btn-outline-primary" onclick="appendValue('4')">4</button>
+            <button class="btn btn-outline-primary" onclick="appendValue('5')">5</button>
+            <button class="btn btn-outline-primary" onclick="appendValue('6')">6</button>
+            <button class="btn btn-outline-secondary" onclick="appendValue('*')">*</button>
+            <button class="btn btn-outline-primary primary" onclick="appendValue('cos(')">cos</button>
+            <button class="btn btn-outline-primary primary" onclick="appendValue('^2')">^2</button>
+            <button class="btn btn-outline-primary secondary" onclick="appendValue('acos(')">cos⁻¹</button>
+            <button class="btn btn-outline-primary secondary" onclick="appendValue('^4')">^4</button>
+
+            <button class="btn btn-outline-primary" onclick="appendValue('1')">1</button>
+            <button class="btn btn-outline-primary" onclick="appendValue('2')">2</button>
+            <button class="btn btn-outline-primary" onclick="appendValue('3')">3</button>
+            <button class="btn btn-outline-secondary" onclick="appendValue('-')">-</button>
+            <button class="btn btn-outline-primary primary" onclick="appendValue('tan(')">tan</button>
+            <button class="btn btn-outline-primary primary" onclick="appendValue('sqrt(')">√</button>
+            <button class="btn btn-outline-primary secondary" onclick="appendValue('atan(')">tan⁻¹</button>
+            <button class="btn btn-outline-primary secondary" onclick="appendValue('cbrt(')">∛</button>
+
+            <button class="btn btn-outline-primary" onclick="appendValue('0')" style="grid-column: span 2;">0</button>
+            <button class="btn btn-outline-primary" onclick="appendValue('.')">.</button>
+            <button class="btn btn-outline-secondary" onclick="appendValue('+')">+</button>
+            <button class="btn btn-outline-primary" onclick="appendValue('pi')">π</button>
+            <button class="btn btn-outline-primary" onclick="appendValue('e')">e</button>
+
+            <button class="btn btn-outline-secondary" onclick="appendAnswer()">Ans</button>
+            <button class="btn btn-success" onclick="calculate()" style="grid-column: span 2;">=</button>
+            <button class="btn btn-outline-secondary" onclick="toggleDegrees()">Degrees</button>
+
+            <button class="btn btn-outline-primary" onclick="appendValue('log10(')">log</button>
+            <button class="btn btn-outline-primary" onclick="appendValue('log(')">ln</button>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let previousAnswer = "0";
+        let isDegrees = false;
+        let shiftActive = false;
+
+        function appendValue(value) {
+            document.getElementById("expression").value += value;
+        }
+
+        function clearExpression() {
+            document.getElementById("expression").value = "";
+            document.getElementById("result").innerText = "";
+        }
+
+        function clearScreen() {
+            document.getElementById("expression").value = "";
+            previousAnswer = "0";
+            document.getElementById("result").innerText = "";
+        }
+
+        function backspace() {
+            const expression = document.getElementById("expression").value;
+            document.getElementById("expression").value = expression.slice(0, -1);
+        }
+
+        function appendAnswer() {
+            document.getElementById("expression").value += previousAnswer;
+        }
+
+        function toggleDegrees() {
+            isDegrees = !isDegrees;
+            const degButton = document.querySelector('button[onclick="toggleDegrees()"]');
+            degButton.innerText = isDegrees ? "Radians" : "Degrees";
+        }
+
+        function toggleShift() {
+            shiftActive = !shiftActive;
+            document.querySelectorAll('.primary').forEach(button => {
+                button.style.display = shiftActive ? 'none' : 'block';
+            });
+            document.querySelectorAll('.secondary').forEach(button => {
+                button.style.display = shiftActive ? 'block' : 'none';
+            });
+            document.getElementById('shiftButton').innerText = shiftActive ? 'SHIFT' : 'SHIFT';
+        }
+
+        function calculate() {
+            let expression = document.getElementById("expression").value;
+            expression = expression.replace(/\^/g, "**");
+
+            fetch("/calculate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: "expression=" + encodeURIComponent(expression) + "&isDegrees=" + isDegrees,
+            })
+                .then(response => response.text())
+                .then(result => {
+                    document.getElementById("result").innerText = "Result: " + result;
+                    previousAnswer = result;
+                    document.getElementById("expression").value = "";
+                    if (result.trim().toLowerCase() === "yes") {
+                        window.location.href = "data";
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("result").innerText = "Error";
+                });
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/1hb0b8P1bZ8VuH5u9tUivzIebhndjU6wwWS+P1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" integrity="sha384-lpyBcfY8AJRUCpEz6QvPrB1FV1N2ZwG9Lgf21p0pbPbFdXK6U+u0knbfB7vf5cfI" crossorigin="anonymous"></script>
+</body>
+
+</html>

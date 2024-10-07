@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <style>
+        #file-input {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #file-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #file-list ul li {
+            margin: 5px 0;
+        }
+
+        #file-viewer {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            width: 100%;
+            height: 500px;
+            overflow: auto;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body class="bg-light text-dark">
+    <div class="container py-5">
+        <h1 class="text-center">Welcome to Hidden Calculator</h1>
+
+        <div id="upload-section" class="text-center mt-4">
+            <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data" class="d-inline-block">
+                <label for="file-input" class="custom-file-upload">
+                    Upload File
+                </label>
+                <input type="file" id="file-input" name="file" onchange="handleFileUpload(event)" required>
+                <br>
+                <input type="submit" value="Upload" class="custom-file-upload mt-2">
+            </form>
+        </div>
+
+        <div id="file-list" class="mt-4">
+            <h2>Files in Folder:</h2>
+            <ul id="file-list-items" class="list-unstyled"></ul>
+        </div>
+
+        <div id="file-viewer" class="mt-4"></div>
+    </div>
+
+    <script>
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                console.log("File selected:", file.name);
+                const fileInfo = document.createElement("p");
+                fileInfo.innerText = `Selected file: ${file.name}`;
+                document.getElementById("upload-section").appendChild(fileInfo);
+            }
+        }
+
+        document.getElementById("upload-form").onsubmit = async function (event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const result = await response.text();
+                alert(result);
+                if (response.status === 200) {
+                    listFiles();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
+
+        async function listFiles() {
+            try {
+                const response = await fetch('/list_files');
+                const data = await response.json();
+                const fileList = document.getElementById("file-list-items");
+                fileList.innerHTML = '';
+                data.files.forEach(file => {
+                    const li = document.createElement("li");
+                    const link = document.createElement("a");
+                    link.href = "#";
+                    link.textContent = file;
+                    link.onclick = async function () {
+                        const urlResponse = await fetch(`/get_file_url?key=${file}`);
+                        const urlResult = await urlResponse.json();
+                        document.getElementById("file-viewer").innerHTML = `
+                            <iframe src="${urlResult.url}" style="width: 100%; height: 100%; border: none;"></iframe>
+                        `;
+                    };
+                    li.appendChild(link);
+
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "Delete";
+                    deleteButton.className = "btn btn-danger btn-sm ml-2";
+                    deleteButton.onclick = async function () {
+                        if (confirm(`Are you sure you want to delete ${file}?`)) {
+                            const deleteResponse = await fetch(`/delete_file?key=${file}`, { method: 'DELETE' });
+                            if (deleteResponse.status === 200) {
+                                alert('File deleted successfully');
+                                listFiles();
+                            } else {
+                                alert('Failed to delete file');
+                            }
+                        }
+                    };
+                    li.appendChild(deleteButton);
+
+                    fileList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        listFiles();
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/1hb0b8P1bZ8VuH5u9tUivzIebhndjU6wwWS+P1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" integrity="sha384-lpyBcfY8AJRUCpEz6QvPrB1FV1N2ZwG9Lgf21p0pbPbFdXK6U+u0knbfB7vf5cfI" crossorigin="anonymous"></script>
+</body>
+
+</html>

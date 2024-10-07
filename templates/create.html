@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <style>
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: auto;
+        }
+
+        .calculator input {
+            grid-column: span 3;
+            text-align: right;
+            padding: 10px;
+            font-size: 18px;
+        }
+
+        .calculator button {
+            padding: 20px;
+            font-size: 18px;
+        }
+
+        #result {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body class="bg-dark text-white d-flex justify-content-center align-items-center min-vh-100">
+    <div class="container text-center">
+        <h1>Enter Password</h1>
+        <form action="/submit_password" method="post" class="calculator">
+            <input type="text" id="expression" name="password" class="form-control" readonly>
+            <button type="button" class="btn btn-secondary" onclick="appendValue('7')">7</button>
+            <button type="button" class="btn btn-secondary" onclick="appendValue('8')">8</button>
+            <button type="button" class="btn btn-secondary" onclick="appendValue('9')">9</button>
+            <button type="button" class="btn btn-secondary" onclick="appendValue('4')">4</button>
+            <button type="button" class="btn btn-secondary" onclick="appendValue('5')">5</button>
+            <button type="button" class="btn btn-secondary" onclick="appendValue('6')">6</button>
+            <button type="button" class="btn btn-secondary" onclick="appendValue('1')">1</button>
+            <button type="button" class="btn btn-secondary" onclick="appendValue('2')">2</button>
+            <button type="button" class="btn btn-secondary" onclick="appendValue('3')">3</button>
+            <button type="button" class="btn btn-secondary" onclick="appendValue('0')" style="grid-column: span 2;">0</button>
+            <button type="button" class="btn btn-secondary" onclick="backspace()">⌫</button>
+            <button type="submit" class="btn btn-success" style="grid-column: span 3;">Submit</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script>
+        function appendValue(value) {
+            document.getElementById("expression").value += value;
+        }
+        function backspace() {
+            const expression = document.getElementById("expression").value;
+            document.getElementById("expression").value = expression.slice(0, -1);
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/1hb0b8P1bZ8VuH5u9tUivzIebhndjU6wwWS+P1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" integrity="sha384-lpyBcfY8AJRUCpEz6QvPrB1FV1N2ZwG9Lgf21p0pbPbFdXK6U+u0knbfB7vf5cfI" crossorigin="anonymous"></script>
+</body>
+
+</html>
